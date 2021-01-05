@@ -72,3 +72,35 @@ body {
 	margin-right: .75em;
 	color: #018aa9;
 }
+
+#statement-title {
+	color: #31c2e3;
+	margin: 1em 0 .5em;
+}
+
+#statement-comment {
+	font-size: 22px;
+	font-weight: 500;
+	margin-bottom: 1.3em;
+}
+
+#button-row {
+	justify-content: space-evenly;
+}
+
+.button {
+	float: right;
+	display: block;
+	background-color: black;
+	color: white;
+	padding: .65em .5em;
+	border: none;
+	width: 195px;
+	border-radius: 5px;
+	transition: background-color .2s ease;
+	cursor: pointer;
+}
+
+.button:hover {
+	background-color: #018aa9;
+}
