@@ -1,0 +1,74 @@
+html, body {
+	padding: 0px;
+	margin: 0px;
+}
+
+body {
+	background-image: url("https://media.discordapp.net/attachments/486490693293047808/795944755204063242/background.jpg");
+	background-size: cover;
+}
+
+#main-container {
+	background-color: white;
+    padding: 2.5em;
+}
+
+#title {
+	font-size: 66px;
+}
+
+#title-left {
+	color: #31c2e3;
+}
+
+#title-right {
+	color: #202020;
+}
+
+#title-desc {
+	font-weight: bold;
+}
+
+#title-comment {
+	color: #01B4DC;
+	font-size: 33px;
+	font-weight: bold;
+	line-height: 1.3em;
+	padding: 1em 0;
+}
+
+#submit {
+	float: right;
+	display: block;
+	background-color: black;
+	color: white;
+	padding: .65em .5em;
+	font-size: 24px;
+	border: none;
+	width: 216px;
+	border-radius: 5px;
+	transition: background-color .2s ease;
+	cursor: pointer;
+}
+
+#submit:hover {
+	background-color: #018aa9;
+}
+
+#content {
+	/*width: 720px;				Uncommenten als ik rechter blauwe balk nog ga toevoegen..*/
+	padding: 1.7em;
+	border: 8px dotted #a2a2a2;
+}
+
+.info {
+	max-width: 430px;
+	margin: .75em 0;
+}
+
+.icon>i {
+	font-size: 40px;
+	float: left;
+	margin-right: .75em;
+	color: #018aa9;
+}
