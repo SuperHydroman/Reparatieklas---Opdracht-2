@@ -1,17 +1,25 @@
+/*
+ * 	Global Variables
+ */
+
 var currentQuestion = 0;
 var answers = [];
 var totalScore = [];
 var commentContainer = document.getElementById("comment-container");
 var buttonsCreated = false;
 var backButton = document.getElementById("arrow-back");
+var questionsComplete = false;
+var checkboxesCreated = false;
+
+/*
+ * 	Start of the code
+ */
 
 doVisibility();
 
-function startStemWijzer() {
-	while(commentContainer.firstChild) {
-		commentContainer.removeChild(commentContainer.lastChild);
-	}
-	// console.log("All childs cleared! :)");
+function startStemWijzer() {				// Starts the StemWijzer
+	removeChilds("comment-container");
+
 	createContent();
 }
 
@@ -27,9 +35,10 @@ function createContent() {
 	loadQuestion(currentQuestion);
 }
 
-function createButtons() {
-	if (buttonsCreated == false) {
+function createButtons() {											// This functions creates the buttons ONLY if the don't exist yet
+	if (buttonsCreated == false || questionsComplete == true) {
 		let button_text = ["Eens", "Geen van beide", "Oneens", "Sla deze vraag over <i class=\"fas fa-long-arrow-alt-right\"></i>"]
+		questionsComplete = false;
 
 		let createMyRow = document.createElement("DIV");
 		createMyRow.classList.add("row");
@@ -49,55 +58,62 @@ function createButtons() {
 	}
 }
 
-function doVisibility() {
+function doVisibility() {				// Controls the visibility of the "BACK button"
 	if (currentQuestion <= 0) {
-		backButton.style.display = "none";
+		backButton.style.visibility = "hidden";
 	}
 	else {
-		backButton.style.display = "initial";
+		backButton.style.visibility = "visible";
 	}
 }	
 
 function loadQuestion(index) {
-	console.log(answers.length);
-	if (answers.length <= 29) {
+	// console.log(answers.length);		<== DEBUGGING
+	// console.log(currentQuestion);	<== DEBUGGING
+
+	if (currentQuestion <= 29) {
 		document.getElementById("statement-title").innerHTML = (index + 1) + ". " + subjects[index].title;		// Creates the Title of the Statement
 		document.getElementById("statement-comment").innerHTML = subjects[index].statement;						// Creates the Comment of the Statement
 
-		// console.log("Question " + (index + 1) + " loaded! At index nr. " + index)
+		console.log("Question " + (index + 1) + " loaded! At index nr. " + index);
+		console.log("");
 		createButtons();
+		if(currentQuestion == 29 && checkboxesCreated == true) {					// Checks if you're at the last questions and if the checkboxes
+			document.getElementById("checkbox-row").remove();						// are already created, if so: The will be removed from the DOM
+			createButtons();
+		}
 	}
 	else {
 		createCheckBoxesContainer();
+		questionsComplete = true;
+		checkboxesCreated = true;
 		console.log("Finished all questions. Well played.");
 	}
 }
 
-function nextQuestion(answer) {
-	// console.log("The users answer was \"" + answer + "\". Loading next question...")
+function nextQuestion(answer) {			// Saves the answer and goes to the next question.
+	console.log("The users answer was \"" + answer + "\". Loading next question...")
 	answers[currentQuestion] = answer;
 	currentQuestion++;
-	loadQuestion(currentQuestion);
 	colorButton();
+	loadQuestion(currentQuestion);
 	doVisibility();
 }
 
-function previousQuestion(answer) {
-	// console.log("Went back one question! Loading previous answer (if needed)...")
+function previousQuestion() {			// Goes back one questions and retrieves the previous saved answer.
+	console.log("Went back one question! Loading previous answer (if needed)...")
 	currentQuestion--;
 	loadQuestion(currentQuestion);
-	// console.log(document.getElementById("button-1"));
 	colorButton();
 	doVisibility();
 }
 
-function colorButton() {
+function colorButton() {		// Controls button colors.
 	let btn1 = document.getElementById("button-1");
 	let btn2 = document.getElementById("button-2");
 	let btn3 = document.getElementById("button-3");
 	let btn4 = document.getElementById("button-4");
 
-	console.log[answers[currentQuestion]];
 	if (answers[currentQuestion] == "pro") {
 		btn1.style.backgroundColor = "#01B4DC";
 		btn2.style.backgroundColor = "black";
@@ -130,20 +146,49 @@ function colorButton() {
 	}
 }
 
-function createCheckBoxesContainer() {
+function createCheckBoxesContainer() {		// Creates the CheckBoxes after all questions have been answered.
 	document.getElementById("statement-title").innerHTML = "Zijn er onderwerpen die u extra belangrijk vindt?";
 	document.getElementById("statement-comment").innerHTML = "Aangevinkte stellingen tellen extra mee bij het berekenen van het resulaat.";
 
+	removeChilds("button-row");
+	document.getElementById("button-row").id = "checkbox-row";
+
+	for (let i = 0; i < 3; i++) {
+		let col_div = document.createElement("DIV");
+		col_div.classList.add("col-4");
+		col_div.id = "column_" + (i+1);
+		document.getElementById("checkbox-row").appendChild(col_div);
+	}
+
 	
+	for (let i = 0; i < subjects.length; i++) {
+		let subjectCheckBox = document.createElement("INPUT");
+		subjectCheckBox.setAttribute('type', 'checkbox');
+		subjectCheckBox.id = "subject_" + (i+1);
 
+		let subjectLabel = document.createElement("LABEL");
+		subjectLabel.setAttribute('for', 'subject_' + (i+1));
+		subjectLabel.innerHTML = subjects[i].title;
+		subjectCheckBox.style.display = "inline-block";
 
-	// let test1 = document.createElement("INPUT");
-	// test1.setAttribute('type', 'checkbox');
-	// test1.id = "test1";
-	// document.getElementById("content").appendChild(test1);
+		if (i <= 9) {
+			document.getElementById("column_1").appendChild(subjectCheckBox);
+			document.getElementById("column_1").appendChild(subjectLabel);
+		}
+		else if (i <= 19) {
+			document.getElementById("column_2").appendChild(subjectCheckBox);
+			document.getElementById("column_2").appendChild(subjectLabel);
+		}
+		else {
+			document.getElementById("column_3").appendChild(subjectCheckBox);
+			document.getElementById("column_3").appendChild(subjectLabel);			
+		}
+	}
+}
 
-	// let test2 = document.createElement("LABEL");
-	// test2.setAttribute('for', 'test1');
-	// test2.innerHTML = "Bindend Referendum";
-	// document.getElementById("content").appendChild(test2);
+function removeChilds(id) {			// Custom method I made to easily removev childs from the specified DOM element.
+	while(document.getElementById(id).firstChild) {
+		document.getElementById(id).removeChild(document.getElementById(id).lastChild);
+	}
+	console.log("All childs cleared! :)");
 }

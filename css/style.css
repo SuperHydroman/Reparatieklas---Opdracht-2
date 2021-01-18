@@ -13,6 +13,10 @@ body {
     padding: 2.5em;
 }
 
+#title-container {
+    height: 138px!important;
+}
+
 #title {
 	font-size: 66px;
 }
@@ -82,6 +86,7 @@ body {
 	font-size: 22px;
 	font-weight: 500;
 	margin-bottom: 1.3em;
+	height: 66px!important;
 }
 
 #button-row {
@@ -108,4 +113,18 @@ body {
 #arrow-back {
 	color: grey;
 	font-size: 150%;
+}
+
+input[type=checkbox], input[type=radio] {
+    box-sizing: border-box;
+    padding: 0;
+    float: left;
+    top: 5px;
+    position: relative;
+    margin-right: 8px;
+}
+
+label {
+    margin-bottom: .5rem;
+    display: block;
 }
