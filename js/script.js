@@ -10,10 +10,18 @@ var buttonsCreated = false;
 var backButton = document.getElementById("arrow-back");
 var questionsComplete = false;
 var checkboxesCreated = false;
+var totalScore = [];
+var checkBoxArray = [];
 
 /*
  * 	Start of the code
  */
+
+ for (var i = 0; i < parties.length; i++) {
+ 	totalScore[parties[i].name] = {
+ 		score: 0
+ 	}
+ }
 
 doVisibility();
 
@@ -79,15 +87,19 @@ function loadQuestion(index) {
 		console.log("");
 		createButtons();
 		if(currentQuestion == 29 && checkboxesCreated == true) {					// Checks if you're at the last questions and if the checkboxes
-			document.getElementById("checkbox-row").remove();						// are already created, if so: The will be removed from the DOM
-			createButtons();
+			if (document.getElementById("checkbox-row") != null) {					// are already created, if so: The will be removed from the DOM
+				document.getElementById("checkbox-row").remove();					// Only for going back a few questions and then go back to the last question.
+				createButtons();													// This is so that you get no error.
+			}
 		}
 	}
 	else {
 		createCheckBoxesContainer();
+		setScore();
 		questionsComplete = true;
 		checkboxesCreated = true;
 		console.log("Finished all questions. Well played.");
+		console.log("");
 	}
 }
 
@@ -108,58 +120,56 @@ function previousQuestion() {			// Goes back one questions and retrieves the pre
 	doVisibility();
 }
 
-function colorButton() {		// Controls button colors.
+function resetBTN() {
+	for (var i = 1; i <= 4; i++) {
+		document.getElementById("button-" + i).style.backgroundColor = "black";
+	}
+}
+
+function colorButton() {				// Controls button colors.
 	let btn1 = document.getElementById("button-1");
 	let btn2 = document.getElementById("button-2");
 	let btn3 = document.getElementById("button-3");
 	let btn4 = document.getElementById("button-4");
 
-	if (answers[currentQuestion] == "pro") {
-		btn1.style.backgroundColor = "#01B4DC";
-		btn2.style.backgroundColor = "black";
-		btn3.style.backgroundColor = "black";
-		btn4.style.backgroundColor = "black";
-	}
-	else if (answers[currentQuestion] == "none") {
-		btn1.style.backgroundColor = "black";
-		btn2.style.backgroundColor = "#01B4DC";
-		btn3.style.backgroundColor = "black";
-		btn4.style.backgroundColor = "black";
-	}
-	else if (answers[currentQuestion] == "contra") {
-		btn1.style.backgroundColor = "black";
-		btn2.style.backgroundColor = "black";
-		btn3.style.backgroundColor = "#01B4DC";
-		btn4.style.backgroundColor = "black";
-	}
-	else if (answers[currentQuestion] == "skipped") {
-		btn1.style.backgroundColor = "black";
-		btn2.style.backgroundColor = "black";
-		btn3.style.backgroundColor = "black";
-		btn4.style.backgroundColor = "#01B4DC";
-	}
-	else {
-		btn1.style.backgroundColor = "black";
-		btn2.style.backgroundColor = "black";
-		btn3.style.backgroundColor = "black";
-		btn4.style.backgroundColor = "black";
+	resetBTN();
+	switch (answers[currentQuestion]) {
+		case "pro":
+			btn1.style.backgroundColor = "#01B4DC";
+			break;
+		case "none":
+			btn2.style.backgroundColor = "#01B4DC";
+			break;
+		case "contra":
+			btn3.style.backgroundColor = "#01B4DC";
+			break;
+		case "skipped":
+			btn4.style.backgroundColor = "#01B4DC";
+			break;
+		default:
+			btn1.style.backgroundColor = "black";
+			btn2.style.backgroundColor = "black";
+			btn3.style.backgroundColor = "black";
+			btn4.style.backgroundColor = "black";
 	}
 }
 
 function createCheckBoxesContainer() {		// Creates the CheckBoxes after all questions have been answered.
+	
 	document.getElementById("statement-title").innerHTML = "Zijn er onderwerpen die u extra belangrijk vindt?";
 	document.getElementById("statement-comment").innerHTML = "Aangevinkte stellingen tellen extra mee bij het berekenen van het resulaat.";
 
 	removeChilds("button-row");
 	document.getElementById("button-row").id = "checkbox-row";
 
+	let checkBoxRow = document.getElementById("checkbox-row");
+
 	for (let i = 0; i < 3; i++) {
 		let col_div = document.createElement("DIV");
 		col_div.classList.add("col-4");
 		col_div.id = "column_" + (i+1);
-		document.getElementById("checkbox-row").appendChild(col_div);
+		checkBoxRow.appendChild(col_div);
 	}
-
 	
 	for (let i = 0; i < subjects.length; i++) {
 		let subjectCheckBox = document.createElement("INPUT");
@@ -183,10 +193,33 @@ function createCheckBoxesContainer() {		// Creates the CheckBoxes after all ques
 			document.getElementById("column_3").appendChild(subjectCheckBox);
 			document.getElementById("column_3").appendChild(subjectLabel);			
 		}
+		checkBoxArray[i] = subjectCheckBox;
+	}
+	let nextBTN = document.createElement("BUTTON");
+	nextBTN.innerHTML = "Volgende <i class=\"fas fa-long-arrow-alt-right\"></i>";
+	nextBTN.style.width = "100%";
+	nextBTN.classList.add("button", "mt-3");
+	checkBoxRow.appendChild(nextBTN);
+
+}
+
+function setScore() {										// Adds score to the corresponding party if your answer is the same as party's answer
+	for (let i = 0; i < subjects.length; i++) {
+		for (let j = 0; j < subjects[i].parties.length; j++) {
+			if (answers[i] == subjects[i].parties[j].position) {
+				totalScore[subjects[i].parties[j].name].score += 1;
+				console.log(answers[i] + " ═════════•°• > ⚠ < •°•═════════ " + subjects[i].parties[j].position)
+
+				if (checkBoxArray[i].checked) {				// Checks if checkbox is checked, if so. Give one additional point to the corrsponding party
+					totalScore[subjects[i].parties[j].name].score += 1;
+					console.log(answers[i] + " ═════════•°• > ⚠ < •°•═════════ " + subjects[i].parties[j].position)
+				}
+			}
+		}
 	}
 }
 
-function removeChilds(id) {			// Custom method I made to easily removev childs from the specified DOM element.
+function removeChilds(id) {									// Custom method I made to easily remove childs from the specified DOM element.
 	while(document.getElementById(id).firstChild) {
 		document.getElementById(id).removeChild(document.getElementById(id).lastChild);
 	}
