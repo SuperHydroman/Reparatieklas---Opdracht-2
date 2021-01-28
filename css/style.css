@@ -13,6 +13,11 @@ body {
     padding: 2.5em;
 }
 
+#main-result {
+	height: 400px;
+    overflow-y: scroll;
+}
+
 #title-container {
     height: 138px!important;
 }
@@ -61,6 +66,7 @@ body {
 
 #content {
 	/*width: 720px;				Uncommenten als ik rechter blauwe balk nog ga toevoegen..*/
+	/*height: 86vh;*/
 	padding: 1.7em;
 	border: 8px dotted #a2a2a2;
 }
@@ -127,4 +133,83 @@ input[type=checkbox], input[type=radio] {
 label {
     margin-bottom: .5rem;
     display: block;
+}
+
+#endscreen-row, #endscreen-qualification {
+	height: 100px;
+}
+
+.prof-row {
+	margin: 25px 0px;
+}
+
+.qual-text {
+    transform: translate(0%, -9%);
+    font-size: large;
+    color: #8c7c2e;
+    padding: 0px 17px;
+}
+
+#profile-picture {
+	width: 100px!important;
+	height: 100px!important;
+}
+
+.qualification-bar {
+    height: 21px;
+    width: 0px;
+    background-color: #d4af37;
+    border-radius: 10px;
+    transform: translate(0%, 3%);
+    /*position: absolute;
+    top: 40px;
+    left: 14px;*/
+    z-index: 10000;
+    transition: all ease-in-out 5s;
+    animation-name: doProgressWidth;
+    animation-duration: 5s;
+    animation-fill-mode: forwards;
+}
+
+.progress-bar {
+    transform: translate(0%, 199%);
+    height: 20px;
+    background-color: darkblue;
+    border-radius: 10px;
+    animation-name: doQualWidth;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+}
+.fixed-width {
+    width: 0%;
+}
+
+@keyframes doQualWidth {
+	from {width: 0%;}
+	to {width: 100%;}
+	/*to {width: 607px;}*/
+}
+
+@keyframes doProgressWidth {
+	from {width: 0%;}
+	to {width: 100%;}
+}
+
+
+
+/* Scrollbar */
+
+#main-result::-webkit-scrollbar {
+  width: 18px;               /* width of the entire scrollbar */
+}
+#main-result::-webkit-scrollbar-track {
+  background: #d4af37;        /* color of the tracking area */
+  box-shadow: inset 0 0 5px black;
+  border-radius: 9px;
+  padding: 10px;
+}
+#main-result::-webkit-scrollbar-thumb {
+  background-color: #2b2be2;    /* color of the scroll thumb */
+  border-radius: 20px;       /* roundness of the scroll thumb */
+  border: 5px solid darkblue;  /* creates padding around scroll thumb */
 }

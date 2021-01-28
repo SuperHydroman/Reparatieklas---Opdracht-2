@@ -2,6 +2,7 @@
  * 	Global Variables
  */
 
+var largeGroupSize = 10;
 var currentQuestion = 0;
 var answers = [];
 var totalScore = [];
@@ -12,6 +13,7 @@ var questionsComplete = false;
 var checkboxesCreated = false;
 var totalScore = [];
 var checkBoxArray = [];
+var sortedArray = [];
 
 /*
  * 	Start of the code
@@ -19,6 +21,7 @@ var checkBoxArray = [];
 
  for (var i = 0; i < parties.length; i++) {
  	totalScore[parties[i].name] = {
+ 		name: parties[i].name,
  		score: 0
  	}
  }
@@ -95,7 +98,7 @@ function loadQuestion(index) {
 	}
 	else {
 		createCheckBoxesContainer();
-		setScore();
+		// setScore();
 		questionsComplete = true;
 		checkboxesCreated = true;
 		console.log("Finished all questions. Well played.");
@@ -195,12 +198,125 @@ function createCheckBoxesContainer() {		// Creates the CheckBoxes after all ques
 		}
 		checkBoxArray[i] = subjectCheckBox;
 	}
+
 	let nextBTN = document.createElement("BUTTON");
 	nextBTN.innerHTML = "Volgende <i class=\"fas fa-long-arrow-alt-right\"></i>";
 	nextBTN.style.width = "100%";
 	nextBTN.classList.add("button", "mt-3");
+	nextBTN.setAttribute("onclick", "endScreen()")
 	checkBoxRow.appendChild(nextBTN);
 
+}
+
+function endScreen() {										// Endscreen!!
+	document.getElementById("content").style.height = "86vh";
+	setScore();
+	removeChilds("checkbox-row");
+
+	document.getElementById("checkbox-row").id = "endscreen-row";
+
+	document.getElementById("statement-title").innerHTML = "Eind score";
+	document.getElementById("statement-comment").innerHTML = "Verander het overzicht met de knoppen aan de linkerkant";
+
+	sortParties();
+	createEndScreenContent();
+}
+
+function createEndScreenContent() {
+	let sideBarDIV = document.createElement("DIV");
+	sideBarDIV.classList.add("col-3");
+	document.getElementById("endscreen-row").appendChild(sideBarDIV);
+
+	let mainResultDIV = document.createElement("DIV");
+	mainResultDIV.classList.add("col-9");
+	mainResultDIV.id = "main-result";
+	document.getElementById("endscreen-row").appendChild(mainResultDIV);
+
+	// Sidebar
+	let optionDIV = document.createElement("DIV");
+	optionDIV.classList.add("ml-4");
+	sideBarDIV.appendChild(optionDIV);
+
+	let optionText = ["Alle partijen", "Grote partijen", "Seculaire partijen"];
+	let optionId = ["show-all", "large-only", "secular-only"];
+
+	for (let i = 0; i < 3; i++) {
+		let createOption = document.createElement("INPUT");
+		createOption.id = optionId[i];
+		createOption.setAttribute("type", "radio");
+		createOption.setAttribute("name", "choice");
+		optionDIV.appendChild(createOption);
+
+		let createOptionLabel = document.createElement("LABEL");
+		createOptionLabel.innerHTML = optionText[i];
+		createOptionLabel.setAttribute("for", optionId[i]);
+		if (i === 0) {
+			createOption.setAttribute("checked", "");
+		}
+		createOptionLabel.classList.add("text-left");
+		optionDIV.appendChild(createOptionLabel);
+	}
+
+	// Profile for all parties
+	createProfileContent();
+}
+
+function createProfileContent() {
+	for (let i = 0; i < sortedArray.length; i++) {
+		let party_qual = calculateQual(i);
+
+		let profileRow = document.createElement("DIV");
+		let profile_Pframe = document.createElement("DIV");
+		let profile_pic = document.createElement("IMG");
+		let profile_qualification = document.createElement("DIV");
+		let profile_progressBar = document.createElement("DIV");
+		let doQualWidth = document.createElement("DIV");
+		let profile_qualificationBar = document.createElement("DIV");
+		let qualText = document.createElement("P");
+
+		profileRow.classList.add("row", "prof-row");
+		profileRow.id = "endscreen-qualification-prof-" + (i+1);
+		document.getElementById("main-result").appendChild(profileRow);
+
+		profile_Pframe.classList.add("col-2");
+		profile_Pframe.classList.add("text-center");
+		profileRow.appendChild(profile_Pframe);
+
+		profile_pic.id = "profile-picture";
+		profile_pic.src = "../img/"+ sortedArray[i].name +".png";
+		profile_Pframe.appendChild(profile_pic);
+
+		profile_qualification.classList.add("col-10");
+		profileRow.appendChild(profile_qualification);
+
+		profile_progressBar.classList.add("progress-bar");
+		profile_qualification.appendChild(profile_progressBar);
+
+		doQualWidth.classList.add("fixed-width");
+		doQualWidth.style.width = party_qual;					// <=== Function returns width into the style property
+		profile_progressBar.appendChild(doQualWidth);
+
+		profile_qualificationBar.classList.add("text-center", "qualification-bar");
+		doQualWidth.appendChild(profile_qualificationBar);
+
+		qualText.classList.add("qual-text");
+		qualText.innerHTML = party_qual;
+		profile_qualificationBar.appendChild(qualText);
+	}
+}
+
+function calculateQual(index) {
+	return (sortedArray[index].score / 60 * 100).toFixed(2) + "%";
+}
+
+function sortParties() {									// Sorts parties from higher to lower score
+	for (let i = (subjects.length*2); i >= 0; i--) {
+		Object.entries(totalScore).forEach(value => {
+			if (value[1].score === i) {
+				sortedArray.push({"name":value[1].name, "score":value[1].score});
+			}
+		});
+	}
 }
 
 function setScore() {										// Adds score to the corresponding party if your answer is the same as party's answer
@@ -208,11 +324,11 @@ function setScore() {										// Adds score to the corresponding party if your 
 		for (let j = 0; j < subjects[i].parties.length; j++) {
 			if (answers[i] == subjects[i].parties[j].position) {
 				totalScore[subjects[i].parties[j].name].score += 1;
-				console.log(answers[i] + " ═════════•°• > ⚠ < •°•═════════ " + subjects[i].parties[j].position)
+				// console.log(answers[i] + " ═════════•°• > ⚠ < •°•═════════ " + subjects[i].parties[j].position)
 
-				if (checkBoxArray[i].checked) {				// Checks if checkbox is checked, if so. Give one additional point to the corrsponding party
+				if (checkBoxArray[i].checked) {				// Checks if checkbox is checked, if so. Give one additional point to the corresponding party
 					totalScore[subjects[i].parties[j].name].score += 1;
-					console.log(answers[i] + " ═════════•°• > ⚠ < •°•═════════ " + subjects[i].parties[j].position)
+					// console.log(answers[i] + " ═════════•°• > ⚠ < •°•═════════ " + subjects[i].parties[j].position);
 				}
 			}
 		}
