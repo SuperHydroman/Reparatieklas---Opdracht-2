@@ -2,7 +2,7 @@
  * 	Global Variables
  */
 
-var largeGroupSize = 10;
+var largeGroupSize = 30;
 var currentQuestion = 0;
 var answers = [];
 var totalScore = [];
@@ -11,6 +11,8 @@ var buttonsCreated = false;
 var backButton = document.getElementById("arrow-back");
 var questionsComplete = false;
 var checkboxesCreated = false;
+var entriesCreated = false;
+var surveyFinished = false;
 var totalScore = [];
 var checkBoxArray = [];
 var sortedArray = [];
@@ -116,11 +118,16 @@ function nextQuestion(answer) {			// Saves the answer and goes to the next quest
 }
 
 function previousQuestion() {			// Goes back one questions and retrieves the previous saved answer.
-	console.log("Went back one question! Loading previous answer (if needed)...")
-	currentQuestion--;
-	loadQuestion(currentQuestion);
-	colorButton();
-	doVisibility();
+	if (!surveyFinished) {
+		console.log("Went back one question! Loading previous answer (if needed)...")
+		currentQuestion--;
+		loadQuestion(currentQuestion);
+		colorButton();
+		doVisibility();
+	}
+	else {
+		console.log("Went back to checkboxes!");
+	}
 }
 
 function resetBTN() {
@@ -208,7 +215,8 @@ function createCheckBoxesContainer() {		// Creates the CheckBoxes after all ques
 
 }
 
-function endScreen() {										// Endscreen!!
+function endScreen() {
+											// Endscreen!!
 	document.getElementById("content").style.height = "86vh";
 	setScore();
 	removeChilds("checkbox-row");
@@ -220,6 +228,7 @@ function endScreen() {										// Endscreen!!
 
 	sortParties();
 	createEndScreenContent();
+	surveyFinished = true;
 }
 
 function createEndScreenContent() {
@@ -237,14 +246,15 @@ function createEndScreenContent() {
 	optionDIV.classList.add("ml-4");
 	sideBarDIV.appendChild(optionDIV);
 
-	let optionText = ["Alle partijen", "Grote partijen", "Seculaire partijen"];
-	let optionId = ["show-all", "large-only", "secular-only"];
+	let optionText = ["Alle partijen", "Seculaire partijen", "Grote partijen"];
+	let optionId = ["show-all", "secular-only", "large-only"];
 
 	for (let i = 0; i < 3; i++) {
 		let createOption = document.createElement("INPUT");
 		createOption.id = optionId[i];
 		createOption.setAttribute("type", "radio");
 		createOption.setAttribute("name", "choice");
+		createOption.setAttribute("onclick", "createProfileContent()");
 		optionDIV.appendChild(createOption);
 
 		let createOptionLabel = document.createElement("LABEL");
@@ -262,46 +272,93 @@ function createEndScreenContent() {
 }
 
 function createProfileContent() {
-	for (let i = 0; i < sortedArray.length; i++) {
-		let party_qual = calculateQual(i);
+	if (!entriesCreated) {
+		for (let i = 0; i < sortedArray.length; i++) {
+			let party_qual = calculateQual(i);
 
-		let profileRow = document.createElement("DIV");
-		let profile_Pframe = document.createElement("DIV");
-		let profile_pic = document.createElement("IMG");
-		let profile_qualification = document.createElement("DIV");
-		let profile_progressBar = document.createElement("DIV");
-		let doQualWidth = document.createElement("DIV");
-		let profile_qualificationBar = document.createElement("DIV");
-		let qualText = document.createElement("P");
+			let profileRow = document.createElement("DIV");
+			let profile_Pframe = document.createElement("DIV");
+			let profile_pic = document.createElement("IMG");
+			let profile_qualification = document.createElement("DIV");
+			let profile_progressBar = document.createElement("DIV");
+			let doQualWidth = document.createElement("DIV");
+			let profile_qualificationBar = document.createElement("DIV");
+			let qualText = document.createElement("P");
 
-		profileRow.classList.add("row", "prof-row");
-		profileRow.id = "endscreen-qualification-prof-" + (i+1);
-		document.getElementById("main-result").appendChild(profileRow);
+			profileRow.classList.add("row", "prof-row");
+			profileRow.id = "endscreen-qual-prof-" + (i+1);
+			document.getElementById("main-result").appendChild(profileRow);
 
-		profile_Pframe.classList.add("col-2");
-		profile_Pframe.classList.add("text-center");
-		profileRow.appendChild(profile_Pframe);
+			profile_Pframe.classList.add("col-2");
+			profile_Pframe.classList.add("text-center");
+			profileRow.appendChild(profile_Pframe);
 
-		profile_pic.id = "profile-picture";
-		profile_pic.src = "../img/"+ sortedArray[i].name +".png";
-		profile_Pframe.appendChild(profile_pic);
+			profile_pic.id = "profile-picture";
+			profile_pic.src = "../img/"+ sortedArray[i].name +".png";
+			profile_Pframe.appendChild(profile_pic);
 
-		profile_qualification.classList.add("col-10");
-		profileRow.appendChild(profile_qualification);
+			profile_qualification.classList.add("col-10");
+			profileRow.appendChild(profile_qualification);
 
-		profile_progressBar.classList.add("progress-bar");
-		profile_qualification.appendChild(profile_progressBar);
+			profile_progressBar.classList.add("progress-bar");
+			profile_qualification.appendChild(profile_progressBar);
 
-		doQualWidth.classList.add("fixed-width");
-		doQualWidth.style.width = party_qual;					// <=== Function returns width into the style property
-		profile_progressBar.appendChild(doQualWidth);
+			doQualWidth.classList.add("fixed-width");
+			doQualWidth.style.width = party_qual;					// <=== Function returns width into the style property
+			profile_progressBar.appendChild(doQualWidth);
 
-		profile_qualificationBar.classList.add("text-center", "qualification-bar");
-		doQualWidth.appendChild(profile_qualificationBar);
+			profile_qualificationBar.classList.add("text-center", "qualification-bar");
+			doQualWidth.appendChild(profile_qualificationBar);
 
-		qualText.classList.add("qual-text");
-		qualText.innerHTML = party_qual;
-		profile_qualificationBar.appendChild(qualText);
+			qualText.classList.add("qual-text");
+			qualText.innerHTML = party_qual;
+			profile_qualificationBar.appendChild(qualText);
+
+			entriesCreated = true;
+		}
+	}
+	else {
+		doOptions();
+	}
+}
+
+function doOptions() {
+	let showAll = document.getElementById("show-all");
+	let secularOnly = document.getElementById("secular-only");
+	let largeOnly = document.getElementById("large-only");
+
+	if (showAll.checked) {
+		for (let i = 0; i < sortedArray.length; i++) {
+			document.getElementById("endscreen-qual-prof-" + (i+1)).style.display = "flex";
+		}
+	}
+	else if (secularOnly.checked) {
+		for (let i = 0; i < sortedArray.length; i++) {
+			for (let j = 0; j < parties.length; j++) {
+				if (sortedArray[i].name === parties[j].name) {
+					if (!parties[j].secular) {
+						document.getElementById("endscreen-qual-prof-" + (i+1)).style.display = "none";
+					}
+					else {
+						document.getElementById("endscreen-qual-prof-" + (i+1)).style.display = "flex";	
+					}
+				}
+			}
+		}
+	}
+	else {
+		for (let i = 0; i < sortedArray.length; i++) {
+			for (let j = 0; j < parties.length; j++) {
+				if (sortedArray[i].name === parties[j].name) {
+					if (parties[j].size < largeGroupSize) {
+						document.getElementById("endscreen-qual-prof-" + (i+1)).style.display = "none";
+					}
+					else {
+						document.getElementById("endscreen-qual-prof-" + (i+1)).style.display = "flex";						
+					}
+				}
+			}
+		}
 	}
 }
 
